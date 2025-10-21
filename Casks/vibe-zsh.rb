@@ -3,7 +3,7 @@ cask "vibe-zsh" do
   name "vibe-zsh"
   desc "Transform natural language into shell commands using AI"
   homepage "https://github.com/skymoore/vibe-zsh"
-  version "0.2.1-beta.14"
+  version "0.2.1-beta.15"
 
   livecheck do
     skip "Auto-generated on release."
@@ -17,41 +17,89 @@ cask "vibe-zsh" do
   on_macos do
     on_intel do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-darwin-amd64.tar.gz"
-      sha256 "6274a134f8269b2bbece68b085640dcfe1f8fb147665223f996194f48d152cd8"
+      sha256 "d08908270e2bc2f2e75cf737310b43cfba710d3e8525447efe8592cfd17a3ce2"
     end
     on_arm do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-darwin-arm64.tar.gz"
-      sha256 "eb44b47e0c88f2030cbe482f0eea228e31d075fcc5d8c0abec37266dfbac7114"
+      sha256 "544b57c76e1d64307dad852a1a9f39b057eb929b744f0113bf316dc0c08d3c85"
     end
   end
 
   on_linux do
     on_intel do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-linux-amd64.tar.gz"
-      sha256 "fe989974d0690a3d99e6de2d4f111f988e66dbcaf7fb5632f6d761b290d27888"
+      sha256 "a168f35330717a6a8486b4bead8f6b437d48c2c7a66bdc377126619f55df246d"
     end
     on_arm do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-linux-arm64.tar.gz"
-      sha256 "48cfe4541f1127dfdb7df2d1a1f943441af429c1bc993e168d1bafad4ad0ef06"
+      sha256 "72b8abd44164e7b1c0bd32a39e485565df45bd166b9ae5fbfa08fa788a3296b5"
+    end
+  end
+
+  postflight do
+    oh_my_zsh_dir = "#{Dir.home}/.oh-my-zsh"
+    zshrc_path = "#{Dir.home}/.zshrc"
+    staged_path = "#{staged_path}"
+
+    unless Dir.exist?(oh_my_zsh_dir)
+      puts "Warning: Oh My Zsh is not installed. vibe requires Oh My Zsh for Ctrl+G functionality."
+      puts "Please install Oh My Zsh: sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
+      puts "After installation, add the following to your ~/.zshrc:"
+      puts "  plugins=(... vibe)"
+      puts "  export PATH=\"#{staged_path}/bin:$PATH\""
+      puts "  source \"#{staged_path}/vibe.plugin.zsh\""
+      puts "  fpath=(#{staged_path} $fpath)"
+      puts "Then source ~/.zshrc"
+    else
+      # Check and add to plugins if needed
+      zshrc_content = File.read(zshrc_path) rescue ""
+      unless zshrc_content.include?("plugins=(... vibe)") # simplistic check
+        puts "Adding 'vibe' to plugins in ~/.zshrc"
+        # Append or modify plugins line - this is tricky, but for simplicity:
+        if zshrc_content.include?("plugins=")
+          zshrc_content.gsub!(/plugins=\((.*?)\)/) { |m| m.sub(/\)$/, " vibe)") }
+        else
+          zshrc_content += "\nplugins=(vibe)\n"
+        end
+        File.write(zshrc_path, zshrc_content)
+      end
+
+      # Add other lines if not present
+      lines_to_add = [
+        "export PATH=\"#{staged_path}/bin:$PATH\"",
+        "source \"#{staged_path}/vibe.plugin.zsh\"",
+        "fpath=(#{staged_path} $fpath)"
+      ]
+      lines_to_add.each do |line|
+        unless zshrc_content.include?(line)
+          zshrc_content += "\n#{line}\n"
+        end
+      end
+      File.write(zshrc_path, zshrc_content)
+
+      puts "vibe setup complete. Please run: source ~/.zshrc"
     end
   end
 
   caveats do
-    "vibe has been installed to:"
-    "  #{staged_path}"
+    "vibe requires Oh My Zsh for Ctrl+G functionality."
     ""
-    "To activate vibe, add the following to your ~/.zshrc:"
+    "vibe has been installed to: #{staged_path}"
     ""
-    "  export PATH=\"#{staged_path}/bin:$PATH\""
-    "  source \"#{staged_path}/vibe.plugin.zsh\""
+    "If Oh My Zsh is installed, vibe has been automatically configured in ~/.zshrc."
+    "Please run: source ~/.zshrc"
+    ""
+    "If Oh My Zsh is not installed, install it: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)""
+    "Then add the following to your ~/.zshrc:"
+    "  plugins=(... vibe)"
+    "  export PATH="#{staged_path}/bin:$PATH""
+    "  source "#{staged_path}/vibe.plugin.zsh""
     "  fpath=(#{staged_path} $fpath)"
-    ""
-    "Then reload your shell:"
-    "  source ~/.zshrc"
+    "And run: source ~/.zshrc"
     ""
     "Configure your AI provider (see https://github.com/skymoore/vibe-zsh#configuration):"
-    "  export VIBE_API_URL=\"http://localhost:11434/v1\""
-    "  export VIBE_MODEL=\"llama3:8b\""
+    "  export VIBE_API_URL="http://localhost:11434/v1""
+    "  export VIBE_MODEL="llama3:8b""
     ""
     "Use Ctrl+G to transform natural language into commands!"
   end
