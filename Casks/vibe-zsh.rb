@@ -3,7 +3,7 @@ cask "vibe-zsh" do
   name "vibe-zsh"
   desc "Transform natural language into shell commands using AI"
   homepage "https://github.com/skymoore/vibe-zsh"
-  version "0.2.1-beta.19"
+  version "0.3.0-beta.1"
 
   livecheck do
     skip "Auto-generated on release."
@@ -17,22 +17,22 @@ cask "vibe-zsh" do
   on_macos do
     on_intel do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-darwin-amd64.tar.gz"
-      sha256 "49717d4518348056972c465149fe5dd5e73acb575091f157aba8022d109477a1"
+      sha256 "cdc646ece2024aeb0f29722462ae3e3e69fd32971df60d7eaf400c66109996a5"
     end
     on_arm do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-darwin-arm64.tar.gz"
-      sha256 "be2bba75e266ff5ccffa1f903b4be4ba2d38ea9234ca65fadc4160bf3fa6a1e8"
+      sha256 "b81d7a8fec371a5c484618b31d6b66be0452f6e3460b9a8abb954e57454ea504"
     end
   end
 
   on_linux do
     on_intel do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-linux-amd64.tar.gz"
-      sha256 "ef41b171aec3054595cbc0c07c63ed5be974ee6a8466c91d546ef0147584f311"
+      sha256 "0c1d7e92d31f367f41db97c7dd07e9ef1980986775564e672a15f278e8db20fb"
     end
     on_arm do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-linux-arm64.tar.gz"
-      sha256 "91c1dc47f219f002286391540fa1eaf992452f9e51fb25af0d941677d1bda361"
+      sha256 "bc9472cb49ed0745dc965b90c7ef22f15badffaf10fdf750db1bcff843826dbf"
     end
   end
 
@@ -74,6 +74,17 @@ cask "vibe-zsh" do
       end
     end
 
+    homebrew_bin = "/opt/homebrew/bin"
+    vibe_zsh_symlink = File.join(homebrew_bin, "vibe-zsh")
+    vibe_binary_in_plugin = File.join(vibe_plugin_dir, "vibe")
+
+    if File.exist?(vibe_binary_in_plugin) && Dir.exist?(homebrew_bin)
+      FileUtils.rm(vibe_zsh_symlink) if File.exist?(vibe_zsh_symlink) || File.symlink?(vibe_zsh_symlink)
+      FileUtils.ln_s(vibe_binary_in_plugin, vibe_zsh_symlink)
+      puts "✓ Created global symlink: /opt/homebrew/bin/vibe-zsh -> #{vibe_binary_in_plugin}"
+      puts "✓ You can now use 'vibe-zsh' command globally"
+    end
+
     zshrc_content = File.read(zshrc_path) rescue ""
     modified = false
 
@@ -108,16 +119,21 @@ cask "vibe-zsh" do
   end
 
   caveats do
-    "vibe requires Oh My Zsh for Ctrl+G functionality."
+    "vibe has been installed successfully!"
     ""
-    "If Oh My Zsh is installed, vibe has been automatically configured."
-    "Please run: source ~/.zshrc"
+    "For ZSH Plugin (Ctrl+G):"
+    "  If Oh My Zsh is installed, vibe has been automatically configured."
+    "  Please run: source ~/.zshrc"
     ""
-    "If Oh My Zsh is not installed, install it first:"
-    "  sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
+    "  If Oh My Zsh is not installed, install it first:"
+    "    sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
     ""
-    "Then add 'vibe' to your plugins in ~/.zshrc:"
-    "  plugins=(... vibe)"
+    "  Then add 'vibe' to your plugins in ~/.zshrc:"
+    "    plugins=(... vibe)"
+    ""
+    "For Direct CLI Usage:"
+    "  The executable is available as: vibe-zsh"
+    "  Example: vibe-zsh "list all docker containers""
     ""
     "Configure your AI provider (see https://github.com/skymoore/vibe-zsh#configuration):"
     "  export VIBE_API_URL=\"http://localhost:11434/v1\""
