@@ -3,7 +3,7 @@ cask "vibe-zsh" do
   name "vibe-zsh"
   desc "Transform natural language into shell commands using AI"
   homepage "https://github.com/skymoore/vibe-zsh"
-  version "0.2.1-beta.18"
+  version "0.2.1-beta.19"
 
   livecheck do
     skip "Auto-generated on release."
@@ -17,22 +17,22 @@ cask "vibe-zsh" do
   on_macos do
     on_intel do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-darwin-amd64.tar.gz"
-      sha256 "cab093d0b0a93c1f700a6d954e2d088d8deb091554430523bb82bc95a5dd7acf"
+      sha256 "49717d4518348056972c465149fe5dd5e73acb575091f157aba8022d109477a1"
     end
     on_arm do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-darwin-arm64.tar.gz"
-      sha256 "a2129affc562c7cc3b4e6544546b808024b92ae18e4ec30a486eafce8d9c0c56"
+      sha256 "be2bba75e266ff5ccffa1f903b4be4ba2d38ea9234ca65fadc4160bf3fa6a1e8"
     end
   end
 
   on_linux do
     on_intel do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-linux-amd64.tar.gz"
-      sha256 "484de4c1c38d4a2bd241ed6299d850ae33af004c9383208b0e9d48998bcca473"
+      sha256 "ef41b171aec3054595cbc0c07c63ed5be974ee6a8466c91d546ef0147584f311"
     end
     on_arm do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-linux-arm64.tar.gz"
-      sha256 "9d73c4a9aef50c58a0d5ec6c5bbc689bcf2b0aaa927af548eeaa90587d6a34c9"
+      sha256 "91c1dc47f219f002286391540fa1eaf992452f9e51fb25af0d941677d1bda361"
     end
   end
 
@@ -114,14 +114,14 @@ cask "vibe-zsh" do
     "Please run: source ~/.zshrc"
     ""
     "If Oh My Zsh is not installed, install it first:"
-    "  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)""
+    "  sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
     ""
     "Then add 'vibe' to your plugins in ~/.zshrc:"
     "  plugins=(... vibe)"
     ""
     "Configure your AI provider (see https://github.com/skymoore/vibe-zsh#configuration):"
-    "  export VIBE_API_URL="http://localhost:11434/v1""
-    "  export VIBE_MODEL="llama3:8b""
+    "  export VIBE_API_URL=\"http://localhost:11434/v1\""
+    "  export VIBE_MODEL=\"llama3:8b\""
     ""
     "Use Ctrl+G to transform natural language into commands!"
   end
