@@ -3,7 +3,7 @@ cask "vibe-zsh" do
   name "vibe-zsh"
   desc "Transform natural language into shell commands using AI"
   homepage "https://github.com/skymoore/vibe-zsh"
-  version "0.3.0-beta.2"
+  version "0.3.1-beta.1"
 
   livecheck do
     skip "Auto-generated on release."
@@ -17,22 +17,22 @@ cask "vibe-zsh" do
   on_macos do
     on_intel do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-darwin-amd64.tar.gz"
-      sha256 "fd8fa3d686b0433e87332347e730721abc1ad99a3106551382036d1a6d2b1a4b"
+      sha256 "347821728d0db1e316ec72db53b90222495442830432cea3251b512758bade4d"
     end
     on_arm do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-darwin-arm64.tar.gz"
-      sha256 "5a7bcfa9ab219110502063531580e7faa178a6d8236f47204607cc0d8bbc2a23"
+      sha256 "1d468c924e3e0cea179501888dd704866b886b346094fb8c1d9693f22f88be39"
     end
   end
 
   on_linux do
     on_intel do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-linux-amd64.tar.gz"
-      sha256 "ce1255b46bab7027682ca36912d52c0026df0eb3d0d70d8fdae9d3c4588f2d5a"
+      sha256 "926adfd152b3b510e23bab38861f48a919cf9173c4f128820455e48f87995f9d"
     end
     on_arm do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-linux-arm64.tar.gz"
-      sha256 "b61c6ba764b0b590ec65cdbeee61e9e21646b302cdf7f160238c2cc2c93e79e0"
+      sha256 "581015d821029cb6be2d139a98d1951664bacb0b9f4f27a17215dafd0d21b84b"
     end
   end
 
