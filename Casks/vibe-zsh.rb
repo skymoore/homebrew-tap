@@ -3,7 +3,7 @@ cask "vibe-zsh" do
   name "vibe-zsh"
   desc "Transform natural language into shell commands using AI"
   homepage "https://github.com/skymoore/vibe-zsh"
-  version "0.2.1-beta.16"
+  version "0.2.1-beta.17"
 
   livecheck do
     skip "Auto-generated on release."
@@ -17,64 +17,78 @@ cask "vibe-zsh" do
   on_macos do
     on_intel do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-darwin-amd64.tar.gz"
-      sha256 "bab5940e2585feb89272aa745af64eb749d6e1f1a7e7afc082cde3adb2c2b367"
+      sha256 "13455b98006434c30b9893a5fa73205fb85a399f2c04f17b03816165e76eb0b8"
     end
     on_arm do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-darwin-arm64.tar.gz"
-      sha256 "261a0722d740d7345cb999cf96c6d04269d1cee3a2b617c975f896cfcba239e1"
+      sha256 "024cb9421401528525ef760e6d97cd11acd12ab8a6e76ff5f040928714fb852b"
     end
   end
 
   on_linux do
     on_intel do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-linux-amd64.tar.gz"
-      sha256 "4848c96bd61398684c7d66734bb9edb2ec787600892adc8ed1847a0b14227e5a"
+      sha256 "374f80d10236ef98194d1721750d3433685c218cc570b5a1f765fd813c9d7c4d"
     end
     on_arm do
       url "https://github.com/skymoore/vibe-zsh/releases/download/v#{version}/vibe-zsh-#{version}-linux-arm64.tar.gz"
-      sha256 "3dea05ea342088bd9e21f387bfcd52c837405ae5c94f4ba9e4317ed7c8a92113"
+      sha256 "b7b2ac808eeed6315f0a14c0b30553563a6cf548a721bac7636cdc7bc1d7fceb"
     end
   end
 
   postflight do
     oh_my_zsh_dir = "#{Dir.home}/.oh-my-zsh"
     zshrc_path = "#{Dir.home}/.zshrc"
-    staged_path = "#{staged_path}"
+    install_path = staged_path
 
     unless Dir.exist?(oh_my_zsh_dir)
       puts "Warning: Oh My Zsh is not installed. vibe requires Oh My Zsh for Ctrl+G functionality."
       puts "Please install Oh My Zsh: sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
       puts "After installation, add the following to your ~/.zshrc:"
       puts "  plugins=(... vibe)"
-      puts "  export PATH=\"#{staged_path}/bin:$PATH\""
-      puts "  source \"#{staged_path}/vibe.plugin.zsh\""
-      puts "  fpath=(#{staged_path} $fpath)"
+      puts "  export PATH=\"#{install_path}/bin:$PATH\""
+      puts "  source \"#{install_path}/vibe.plugin.zsh\""
+      puts "  fpath=(#{install_path} $fpath)"
       puts "Then source ~/.zshrc"
     else
-      # Check and add to plugins if needed
       zshrc_content = File.read(zshrc_path) rescue ""
-      unless zshrc_content.include?("plugins=(... vibe)") # simplistic check
+
+      unless zshrc_content =~ /\bvibe\b/
         puts "Adding 'vibe' to plugins in ~/.zshrc"
-        # Append or modify plugins line - this is tricky, but for simplicity:
-        if zshrc_content.include?("plugins=")
-          zshrc_content.gsub!(/plugins=\((.*?)\)/) { |m| m.sub(/\)$/, " vibe)") }
+        if zshrc_content.match?(/plugins=\(([\s\S]*?)\)/m)
+          zshrc_content.gsub!(/plugins=\(([\s\S]*?)\)/m) do |m|
+            plugins_list = $1.strip
+            if plugins_list.empty?
+              "plugins=(vibe)"
+            else
+              if plugins_list.include?("\n")
+                "plugins=(#{plugins_list}\n  vibe\n)"
+              else
+                "plugins=(#{plugins_list} vibe)"
+              end
+            end
+          end
         else
           zshrc_content += "\nplugins=(vibe)\n"
         end
-        File.write(zshrc_path, zshrc_content)
       end
 
-      # Add other lines if not present
-      lines_to_add = [
-        "export PATH=\"#{staged_path}/bin:$PATH\"",
-        "source \"#{staged_path}/vibe.plugin.zsh\"",
-        "fpath=(#{staged_path} $fpath)"
-      ]
-      lines_to_add.each do |line|
-        unless zshrc_content.include?(line)
-          zshrc_content += "\n#{line}\n"
-        end
+      path_line = "export PATH=\"#{install_path}/bin:$PATH\""
+      source_line = "source \"#{install_path}/vibe.plugin.zsh\""
+      fpath_line = "fpath+=(#{install_path})"
+
+      unless zshrc_content.include?(path_line) || zshrc_content =~ /export PATH=.*vibe-zsh.*bin/
+        zshrc_content += "\n#{path_line}\n"
       end
+
+      unless zshrc_content.include?(source_line) || zshrc_content =~ /source.*vibe\.plugin\.zsh/
+        zshrc_content += "#{source_line}\n"
+      end
+
+      unless zshrc_content.include?(fpath_line) || zshrc_content =~ /fpath.*vibe-zsh/
+        zshrc_content += "#{fpath_line}\n"
+      end
+
       File.write(zshrc_path, zshrc_content)
 
       puts "vibe setup complete. Please run: source ~/.zshrc"
